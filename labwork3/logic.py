@@ -74,13 +74,30 @@ class TikTakLogic(LogicBase):
         lineResults = list(filter(lambda x: x.player != 0, lineResults))
         lineResults.sort()
 
+        print([(x.player, x.cells) for x in lineResults])
+
         if len(lineResults) <= 0:
             return LogicBase.LogicResult(state=LogicBase.LogicResult.ResultState.Draw)
 
+        # if lineResults[0].cells <= 2 and 0 in [a for b in field for a in b]:
+        #     return LogicBase.LogicResult(state=LogicBase.LogicResult.ResultState.Draw, permanent=True)
+
+        playerScore = 0
+        botScore = 0
+        for winner in list(filter(lambda x: x.cells == lineResults[0].cells, lineResults)):
+            if winner.player == 1: playerScore += 1
+            elif winner.player == -1: botScore += 1
+
         permanent: bool = max([len(field[0]), len(field)]) <= lineResults[0].cells
         state: LogicBase.LogicResult.ResultState = (
-            LogicBase.LogicResult.ResultState.Draw) if lineResults[0].cells <= 2 else (
-            LogicBase.LogicResult.ResultState.PlayerWin if lineResults[0].player == 1 else
-            LogicBase.LogicResult.ResultState.BotWin)
+            LogicBase.LogicResult.ResultState.Draw if playerScore == botScore else (
+                LogicBase.LogicResult.ResultState.PlayerWin if playerScore > botScore
+                else LogicBase.LogicResult.ResultState.BotWin
+            )
+        )
+        # state: LogicBase.LogicResult.ResultState = (
+        #     LogicBase.LogicResult.ResultState.Draw) if lineResults[0].cells <= 2 else (
+        #     LogicBase.LogicResult.ResultState.PlayerWin if lineResults[0].player == 1 else
+        #     LogicBase.LogicResult.ResultState.BotWin)
         return LogicBase.LogicResult(state=state, permanent=permanent)
 
