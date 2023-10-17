@@ -74,7 +74,7 @@ class TikTakLogic(LogicBase):
         lineResults = list(filter(lambda x: x.player != 0, lineResults))
         lineResults.sort()
 
-        print([(x.player, x.cells) for x in lineResults])
+        # print([(x.player, x.cells) for x in lineResults])
 
         if len(lineResults) <= 0:
             return LogicBase.LogicResult(state=LogicBase.LogicResult.ResultState.Draw)
@@ -87,6 +87,8 @@ class TikTakLogic(LogicBase):
         for winner in list(filter(lambda x: x.cells == lineResults[0].cells, lineResults)):
             if winner.player == 1: playerScore += 1
             elif winner.player == -1: botScore += 1
+
+        print(f'player: {playerScore}; bot: {botScore}')
 
         permanent: bool = max([len(field[0]), len(field)]) <= lineResults[0].cells
         state: LogicBase.LogicResult.ResultState = (

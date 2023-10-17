@@ -49,25 +49,36 @@ class TikTakScene(SceneMaker):
         SceneMaker.__init__(self, size)
         self.__logic = logic
 
-    def render(self) -> bool:
+    def __checkField(self):
+        stage: LogicBase.LogicResult = self.__logic.calculate(self.field)
+
+        if not (0 in [a for b in self.field for a in b]) or stage.permanent:
+            self.__draw()
+            print(f'Игра закончилась: {stage.state}')
+            return False
+        return True
+
+    def __draw(self):
         for rows in self.field:
             [print('|\t{:s}\t'.format('[ x ]' if i == 1 else ('[ 0 ]' if i == -1 else '[ _ ]')), end='') for i in rows]
             print(f'\n{"".join(["-" for i in range(12 * self.width)])}', end='\n')
 
-        stage: LogicBase.LogicResult = self.__logic.calculate(self.field)
-        if not (0 in [a for b in self.field for a in b]) or stage.permanent:
-            print(f'Игра закончилась: {stage.state}')
-            return False
+    def render(self) -> bool:
+        self.__draw()
         try:
             (x, y) = map(lambda x: int(x), input('Введите координаты (x y): ').split(' '))
             if self.field[y][x] == 0:
                 self.field[y][x] = 1
+                if not self.__checkField(): return False
+
                 botStepList = []
                 for y, row in enumerate(self.field):
                     botStepList.extend(list(filter(lambda x: x[2] == 0, [(x, y, col) for x, col in enumerate(row)])))
 
                 botChoice = random.choice(botStepList)
                 self.field[botChoice[1]][botChoice[0]] = -1
+
+                if not self.__checkField(): return False
 
             else: print('Клетка занята, нужна другая')
         except IndexError as error: print('Неверные координаты')
